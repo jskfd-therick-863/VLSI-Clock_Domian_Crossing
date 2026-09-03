@@ -1,0 +1,19 @@
+FIX ID=C02 ACTION=CONVERT_SCHEME BEFORE=SCHEME=TWO_FF TARGET=SCHEME=FIFO PAIR=clk_cpu->clk_bus REASON=signal 'data[7:0]' (8-bit) is a data payload bus; an async FIFO gives a safe buffered handoff for streaming data; converting from SCHEME=TWO_FF. Expected post-fix: SCHEME=FIFO, MULTI_BIT_UNSAFE cleared.
+FIX ID=C05 ACTION=ADD_SYNC BEFORE=SCHEME=TWO_FF,SYNC_FF=1 TARGET=SCHEME=TWO_FF,SYNC_FF=3 PAIR=clk_io->clk_cpu REASON=SYNC_FF=1 is below the minimum synchronizer depth (destination clock is fast, needs 3 flops). Expected post-fix: SYNC_FF=3, MISSING_SYNC cleared.
+FIX ID=C08 ACTION=ADD_SYNC BEFORE=SCHEME=NONE,SYNC_FF=0 TARGET=SCHEME=TWO_FF,SYNC_FF=2 PAIR=clk_bus->clk_dsp REASON=SYNC_FF=0 is below the minimum synchronizer depth (needs 2 flops). Expected post-fix: SYNC_FF=2, MISSING_SYNC cleared.
+FIX ID=C09 ACTION=DOCUMENT BEFORE=UNDOCUMENTED TARGET=WAIVE_PERMANENT PAIR=clk_cpu->clk_cpu_div2 REASON=SRC_CLK and DST_CLK are in the same synchronous clock group, so this is not a true CDC; add a permanent, owned waiver (or remove the record) so it is not re-flagged. Expected post-fix: crossing documented, no longer analyzed as a CDC.
+FIX ID=C13 ACTION=ADD_RESET_SYNC BEFORE=SCHEME=TWO_FF TARGET=SCHEME=RESET_SYNC PAIR=clk_cpu->clk_io REASON=asynchronous reset crossing has no reset synchronizer. Expected post-fix: SCHEME=RESET_SYNC, UNSYNC_RESET cleared.
+FIX ID=C17 ACTION=CONVERT_SCHEME BEFORE=SCHEME=NONE TARGET=SCHEME=FIFO PAIR=clk_dsp->clk_io REASON=signal 'dsp_data[31:0]' (32-bit) is a data payload bus; an async FIFO gives a safe buffered handoff for streaming data; converting from SCHEME=NONE. Expected post-fix: SCHEME=FIFO, MULTI_BIT_UNSAFE cleared.
+FIX ID=C18 ACTION=DEEPEN_SYNC BEFORE=SYNC_FF=2 TARGET=SYNC_FF=3 PAIR=clk_bus->clk_cpu REASON=destination clock is fast (period < FAST_CLOCK_PERIOD_NS); deepen synchronizer from 2 to 3 flops. Expected post-fix: SYNC_FF=3, SYNC_DEPTH_LOW cleared.
+FIX ID=C20 ACTION=DEEPEN_SYNC BEFORE=SYNC_FF=2 TARGET=SYNC_FF=3 PAIR=clk_bus->clk_cpu REASON=destination clock is fast (period < FAST_CLOCK_PERIOD_NS); deepen synchronizer from 2 to 3 flops. Expected post-fix: SYNC_FF=3, SYNC_DEPTH_LOW cleared.
+FIX ID=B_CTRL ACTION=MERGE_BUNDLE BEFORE=SCHEME=TWO_FF (independent per-signal, members C21,C22) TARGET=SCHEME=HANDSHAKE (single bundle-wide qualifier) PAIR=clk_cpu->clk_bus REASON=members C21,C22 are synchronized independently and can recombine with a one-cycle skew; replace with one common HANDSHAKE qualifier for the whole bundle. Expected post-fix: single shared qualifier, RECONVERGENCE cleared.
+
+WAIVER_ACTION ID=C99 ACTION=REMOVE_WAIVER REASON=waiver targets CDC_ID=C99, which no longer exists in cdc.rpt; delete it
+WAIVER_ACTION ID=C03 ACTION=REMOVE_WAIVER REASON=duplicate waiver entry for CDC_ID=C03; keep the first occurrence, delete this one
+WAIVER_ACTION ID=C17 ACTION=RENEW_OR_FIX REASON=waiver expired 2026-06-30 (before signoff date 2026-09-01); fix the underlying crossing (see the matching FIX action) and delete this waiver
+WAIVER_ACTION ID=C05 ACTION=REJECT_WAIVER REASON=waiver targets a CRITICAL violation on CDC_ID=C05, which cannot be waived; delete the waiver and fix the crossing
+
+TOTAL_ACTIONS=13
+EXPECTED_OPEN_CRITICAL_AFTER=0
+EXPECTED_OPEN_MAJOR_AFTER=0
+EXPECTED_INVALID_WAIVERS_AFTER=0
